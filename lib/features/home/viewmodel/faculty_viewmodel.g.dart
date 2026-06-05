@@ -57,7 +57,7 @@ final class FacultyListViewModelProvider
 }
 
 String _$facultyListViewModelHash() =>
-    r'b5598e6120b72a92117ba5c029c771044e91b2a8';
+    r'84458dd56bef98b21b4b2a7ed34a936deb227b6c';
 
 /// Holds the full list of faculty members loaded from VTOP.
 /// State is `null` when not yet fetched, `AsyncLoading` during fetch,
@@ -137,7 +137,7 @@ final class FacultyDetailsViewModelProvider
 }
 
 String _$facultyDetailsViewModelHash() =>
-    r'668bafe7ad68f47026024624ca1ac63330f3fb1d';
+    r'89ea254f0543f4c7e378d7e822d9883ca84d2105';
 
 /// Holds the details of a single faculty member fetched on demand.
 /// State starts as `null` (idle). Call [fetchDetails] when the user taps
