@@ -10,7 +10,7 @@ Future<void> initDependencies() async {
   // Dotenv
   await dotenv.load(fileName: '.env');
 
-  await HomeWidget.setAppGroupId('group.com.udhay.vitapstudentapp');
+  await HomeWidget.setAppGroupId('group.com.harsha.vitapstudentapp');
 
   await NotificationService.initialize();
 

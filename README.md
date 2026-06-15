@@ -27,7 +27,7 @@
 <br>
 
 <p align="center">
-    <a href="https://play.google.com/store/apps/details?id=com.udhay.vitapstudentapp">
+    <a href="https://play.google.com/store/apps/details?id=com.harsha.vitapstudentapp">
         <img src="https://img.shields.io/badge/Google_Play-414141?logo=google-play&logoColor=white" alt="Get it on Google Play" height="80">
     </a>
     <a href="https://apps.apple.com/in/app/vitap-student/id6748966515">

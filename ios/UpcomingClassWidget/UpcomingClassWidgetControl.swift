@@ -12,7 +12,7 @@ import WidgetKit
 struct UpcomingClassWidgetControl: ControlWidget {
     var body: some ControlWidgetConfiguration {
         StaticControlConfiguration(
-            kind: "com.udhay.vitapstudentapp.UpcomingClassWidget",
+            kind: "com.harsha.vitapstudentapp.UpcomingClassWidget",
             provider: Provider()
         ) { value in
             ControlWidgetToggle(

@@ -63,6 +63,6 @@ class DefaultFirebaseOptions {
     messagingSenderId: '19731657233',
     projectId: 'vit-ap-student-app-937f2',
     storageBucket: 'vit-ap-student-app-937f2.appspot.com',
-    iosBundleId: 'com.udhay.vitapstudentapp',
+    iosBundleId: 'com.harsha.vitapstudentapp',
   );
 }

@@ -3,7 +3,7 @@ class AppConfig {
   static const String appName = 'VIT AP Student App';
   static const String appVersion = '1.0.0';
   static const String buildNumber = '1';
-  static const String packageName = 'com.udhay.vitapstudentapp';
+  static const String packageName = 'com.harsha.vitapstudentapp';
 
   // Feature Flags
   static const bool enablePushNotifications = true;

@@ -1,4 +1,4 @@
-package com.udhay.vitapstudentapp
+package com.harsha.vitapstudentapp
 
 import android.app.PendingIntent
 import android.appwidget.AppWidgetManager

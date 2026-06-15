@@ -1,8 +1,12 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pinput/pinput.dart';
 import 'package:vit_ap_student_app/core/common/widget/loader.dart';
 import 'package:vit_ap_student_app/core/services/vtop_service.dart';
+import 'package:vit_ap_student_app/features/auth/services/gmail_otp_service.dart';
+import 'package:vit_ap_student_app/features/auth/viewmodel/gmail_otp_link_controller.dart';
 import 'package:vit_ap_student_app/features/auth/viewmodel/login_otp_viewmodel.dart';
 import 'package:vit_ap_student_app/init_dependencies.dart';
 
@@ -27,17 +31,30 @@ class _LoginOtpSheetState extends ConsumerState<_LoginOtpSheet> {
   final _pinController = TextEditingController();
   final _focusNode = FocusNode();
   String? _errorMessage;
+  String? _gmailStatusMessage;
   bool _resendSuccess = false;
+  bool _isCheckingGmail = false;
+  int _gmailLookupRun = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    Future.microtask(_startGmailOtpLookup);
+  }
 
   @override
   void dispose() {
+    _gmailLookupRun++;
     _pinController.dispose();
     _focusNode.dispose();
     super.dispose();
   }
 
   Future<void> _submit() async {
-    final pin = _pinController.text.trim();
+    await _submitCode(_pinController.text.trim());
+  }
+
+  Future<void> _submitCode(String pin) async {
     if (pin.length != 6) {
       setState(() => _errorMessage = 'Please enter a 6-digit OTP');
       return;
@@ -46,14 +63,73 @@ class _LoginOtpSheetState extends ConsumerState<_LoginOtpSheet> {
     await ref.read(loginOtpViewModelProvider.notifier).submitOtp(pin);
   }
 
+  Future<void> _startGmailOtpLookup() async {
+    final runId = ++_gmailLookupRun;
+    final since = DateTime.now();
+
+    final linkState = await ref.read(gmailOtpLinkControllerProvider.future);
+    if (!mounted || runId != _gmailLookupRun || !linkState.isLinked) return;
+
+    setState(() {
+      _isCheckingGmail = true;
+      _gmailStatusMessage = 'Checking linked Gmail for OTP...';
+    });
+
+    for (var attempt = 0; attempt < 6; attempt++) {
+      if (!mounted || runId != _gmailLookupRun) return;
+
+      try {
+        final otp = await ref
+            .read(gmailOtpServiceProvider)
+            .findLatestOtp(since: since);
+        if (otp != null) {
+          if (!mounted || runId != _gmailLookupRun) return;
+          _pinController.text = otp;
+          setState(() {
+            _isCheckingGmail = false;
+            _gmailStatusMessage = 'OTP found in Gmail. Verifying...';
+          });
+          await _submitCode(otp);
+          return;
+        }
+      } on GmailOtpException catch (error) {
+        if (!mounted || runId != _gmailLookupRun) return;
+        setState(() {
+          _isCheckingGmail = false;
+          _gmailStatusMessage = error.message;
+        });
+        return;
+      } catch (_) {
+        if (!mounted || runId != _gmailLookupRun) return;
+        setState(() {
+          _isCheckingGmail = false;
+          _gmailStatusMessage =
+              'Gmail linked, but OTP could not be read. Enter it manually.';
+        });
+        return;
+      }
+
+      await Future<void>.delayed(const Duration(seconds: 5));
+    }
+
+    if (!mounted || runId != _gmailLookupRun) return;
+    setState(() {
+      _isCheckingGmail = false;
+      _gmailStatusMessage = 'No fresh OTP found in linked Gmail yet.';
+    });
+  }
+
   Future<void> _resend() async {
+    _gmailLookupRun++;
     setState(() {
       _errorMessage = null;
+      _gmailStatusMessage = null;
       _resendSuccess = false;
     });
     await ref.read(loginOtpViewModelProvider.notifier).resendOtp();
     if (mounted) {
       setState(() => _resendSuccess = true);
+      unawaited(_startGmailOtpLookup());
     }
   }
 
@@ -170,6 +246,49 @@ class _LoginOtpSheetState extends ConsumerState<_LoginOtpSheet> {
                         'OTP resent to your email',
                         style: theme.textTheme.bodySmall?.copyWith(
                           color: theme.colorScheme.onPrimaryContainer,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 12),
+            ],
+            if (_gmailStatusMessage != null) ...[
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 8,
+                ),
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.surfaceContainerHighest,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Row(
+                  children: [
+                    if (_isCheckingGmail)
+                      SizedBox(
+                        width: 18,
+                        height: 18,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: theme.colorScheme.primary,
+                        ),
+                      )
+                    else
+                      Icon(
+                        Icons.mail_outline_rounded,
+                        size: 18,
+                        color: theme.colorScheme.primary,
+                      ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        _gmailStatusMessage!,
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: theme.colorScheme.onSurfaceVariant,
                           fontWeight: FontWeight.w500,
                         ),
                       ),

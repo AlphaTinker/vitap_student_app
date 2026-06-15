@@ -36,9 +36,9 @@ struct Provider: TimelineProvider {
     }
     
     private func fetchNextClass() -> SimpleEntry {
-        let logger = Logger(subsystem: "com.udhay.vitapstudentapp", category: "UpcomingClassWidget")
+        let logger = Logger(subsystem: "com.harsha.vitapstudentapp", category: "UpcomingClassWidget")
         
-        guard let sharedDefaults = UserDefaults(suiteName: "group.com.udhay.vitapstudentapp") else {
+        guard let sharedDefaults = UserDefaults(suiteName: "group.com.harsha.vitapstudentapp") else {
             logger.error("Failed to access shared user defaults")
             return SimpleEntry(date: Date(), courseName: "No Data", faculty: "", venue: "", timing: "")
         }
@@ -83,7 +83,7 @@ struct Provider: TimelineProvider {
     }
     
     private func findNextClass(classes: [[String: Any]]) -> [String: Any]? {
-        let logger = Logger(subsystem: "com.udhay.vitapstudentapp", category: "UpcomingClassWidget")
+        let logger = Logger(subsystem: "com.harsha.vitapstudentapp", category: "UpcomingClassWidget")
         let now = Date()
         let calendar = Calendar.current
         let timeFormatter = DateFormatter()
