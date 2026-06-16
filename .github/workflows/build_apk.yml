@@ -30,6 +30,13 @@ jobs:
         with:
           targets: aarch64-linux-android, armv7-linux-androideabi, x86_64-linux-android, i686-linux-android
 
+      - name: Create .env file
+        run: |
+          echo "WIREDASH_SECRET_KEY=placeholder" >> .env
+          echo "FOR_YOU_API_KEY=placeholder" >> .env
+          echo "VTOP_USERNAME=placeholder" >> .env
+          echo "VTOP_PASSWORD=placeholder" >> .env
+
       - name: Install dependencies
         run: flutter pub get
 
